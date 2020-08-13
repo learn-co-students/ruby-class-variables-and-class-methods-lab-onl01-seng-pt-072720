@@ -1,84 +1,57 @@
 require "spec_helper"
 
-describe "Song" do
+class Song
 
-  let!(:lucifer) { Song.new("Lucifer", "Jay-Z", "rap" ) }
-  let!(:ninety_nine_problems) { Song.new("99 Problems", "Jay-Z", "rap") }
-  let!(:hit_me) { Song.new("hit me baby one more time", "Brittany Spears", "pop") }
- 
-  after(:each) do 
-    Song.class_variable_set(:@@artists, [])
-    Song.class_variable_set(:@@genres, [])
-    Song.class_variable_set(:@@count, 0)
-    Song.class_variable_set(:@@artist_count, {})
-    Song.class_variable_set(:@@genre_count, {})
+  attr_accessor :name, :artist, :genre
 
-  end
-  describe "#new" do 
-    it "takes in three arguments: a name, artist and genre" do 
-      expect{Song.new("hit me baby one more time", "Brittany Spears", "pop")}.to_not raise_error
-    end
+  @@song_count = 0
+  @@genres = []
+  @@artists = []
+
+  def initialize(name, artist, genre)
+    @name = name
+    @artist = artist
+    @genre = genre
+    @@genres << @genre
+    @@artists << @artist
+    @@song_count +=1
   end
 
-  describe "#name" do 
-    it "has a name" do 
-      expect(hit_me.name).to eq("hit me baby one more time")
-    end
+  def self.count
+    @@song_count
   end
 
-  describe "#artist" do 
-    it "has an artist" do 
-      expect(hit_me.artist).to eq("Brittany Spears")
-    end
+  def self.genres
+    @@genres.uniq
   end
 
-  describe "#genre" do 
-    it "has a genre" do
-      expect(hit_me.genre).to eq("pop") 
-    end
+  def self.artists
+    @@artists.uniq
   end
 
-  describe "class variables" do 
-    it "has a class variable, @@count" do 
-      expect(Song.class_variable_get(:@@count)).to eq(3)
+  def self.genre_count
+    genre_count = {}
+    @@genres.each do |genre| 
+      if genre_count[genre]
+      genre_count[genre] += 1 
+      else
+      genre_count[genre] = 1
+      end
     end
-
-    it "has a class variable, @@artists, that contains all of the artists of existing songs" do 
-      expect(Song.class_variable_get(:@@artists)).to match(["Jay-Z", "Jay-Z", "Brittany Spears"])
-    end
-
-    it "has a class variable, @@genres, that contains all of the genres of existing songs" do 
-      expect(Song.class_variable_get(:@@genres)).to match(["rap", "rap", "pop"])
-    end
+    genre_count
   end
 
-  describe ".count" do 
-    it "is a class method that returns that number of songs created" do
-      expect(Song.count).to eq(3)
+  def self.artist_count
+    artist_count = {}
+    @@artists.each do |artist|
+      if artist_count[artist]
+      artist_count[artist] +=1
+      else
+      artist_count[artist] = 1
+      end
     end
+    artist_count
   end
 
-  describe ".artists" do
-    it "is a class method that returns a unique array of artists of existing songs" do 
-      expect(Song.artists).to match(["Jay-Z", "Brittany Spears"])
-    end 
-  end
-
-  describe ".genres" do 
-    it "is a class method that returns a unique array of genres of existing songs" do 
-      expect(Song.genres).to match(["rap", "pop"])
-    end
-  end
-
-  describe ".genre_count" do 
-    it "is a class method that returns a hash of genres and the number of songs that have those genres" do 
-      expect(Song.genre_count).to eq({"pop" => 1, "rap" => 2})
-    end
-  end
-
-  describe ".artist_count" do 
-    it "is a class method that returns a hash of artists and the number of songs that have those artists" do 
-      expect(Song.artist_count).to eq({"Brittany Spears" => 1, "Jay-Z" => 2})
-    end
-  end
 end
+
